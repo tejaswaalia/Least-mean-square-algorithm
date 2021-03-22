@@ -1,0 +1,38 @@
+clc
+clear all
+close all
+w = zeros(1,21);
+w_o = randn(1,21);
+answer=zeros(100);
+N = 100;
+for j=1:100
+t=[0:N-1];
+x= randn(1,N); 
+d1 = filter(w_o,1,x);
+pl = length(d1);
+d = d1+randn(1,N)*sqrt(0.001);
+%we need to define regressor vector first of same length as unknown system and everytime we have to take convolution and for all sequences we need corresponding output seq.
+%R = x*x'; 
+%e=eig(R);
+%me =  max(e);
+%maxmu = 2/me
+%w=zeros(1,N);
+mu=0.065;
+for i=21:N
+   x1 = [x(i:-1:i-20)];
+   e(i) = d(i) - w* x1';
+   w = w + mu * e(i) * x1;
+end
+iwant(j,:)=e.^2;
+yd = filter(w,1,x);
+end
+answer=mean(iwant);
+
+subplot(221),plot(t,d),ylabel('Desired Signal'),
+subplot(222),plot(t,x),ylabel('Input Signal+Noise'),
+subplot(223),plot(t,10*log10(e.^2)),ylabel('Error'),
+%subplot(224),plot(t,yd),ylabel('Adaptive Desired output')
+subplot(224),plot(10*log10(answer)),ylabel('ensemble average'),
+
+%do error square plot in log scale(db scale),it will give us mean square
+%deviation.
